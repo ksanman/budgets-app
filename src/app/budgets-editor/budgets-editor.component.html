@@ -1,0 +1,174 @@
+<div class="modal-header">
+  <h4>Budget Editor </h4> 
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+  <div class="card">
+    <div class="card-header">
+      <h2> Details </h2>
+    </div>
+    <div class="card-body">
+      <form class="form-group" (ngSubmit)="onSubmit()" #budgetForm="ngForm">
+        <div class="row">
+          <label class="col-form-label col-sm-6"> Name:
+              <input class="form-control" [(ngModel)]="budget.name" name="budgetName" placeholder="Budget Name" required minlength="1"/> 
+          </label>
+          <label  class="col-form-label col-sm-6"> Budget Period: 
+            <select class="form-control" [(ngModel)]="budget.budgetPeriod" name="budgetPeriod" required>
+              <option *ngFor="let key of budgetFrequencyKeys" [ngValue]="key" [label]="budgetFrequencies[key]"> </option>
+            </select>
+          </label>
+        </div>
+        <div class="form-group">
+          <h3> Incomes </h3>
+          <div class="no-list" *ngIf="budget.incomes.length < 1">
+            No Incomes
+          </div>
+          <div class="form-group">
+            <div *ngFor="let income of budget.incomes; let i=index">
+              <div class="form-group">
+                <div class="row">
+                  <label  class="col-form-label col-sm-4"> Name:
+                    <input class="form-control" type="text" [(ngModel)]="income.name" name="incomeName-{{i}}" placeholder="Income Name" required minlength="1"/>
+                  </label>
+                  <label class="col-form-label col-sm-4"> Type: 
+                    <select class="form-control" [(ngModel)]="income.incomeType" name="incomeType-{{i}}" required>
+                      <option *ngFor="let key of incomeTypeKeys" [value]="key" [label]="incomeTypes[key]"></option>
+                    </select>
+                  </label>
+                  <label class="col-form-label col-sm-4"> Pay Frequency: 
+                    <select class="form-control" [(ngModel)]="income.payFrequecy" name="payFrequecy-{{i}}" required>
+                      <option *ngFor="let key of payFrequencyKeys" [value]="key" [label]="payFrequencies[key]"></option>
+                    </select>
+                  </label>
+                </div>
+                <div *ngIf="income.incomeType==1">
+                  <div class="form-group">
+                    <div class="row">
+                      <label class="col-form-label col-sm-4"> Salary: 
+                        <input class="form-control" type="number" [(ngModel)]="income.salary" name="salary-{{i}}" required min="0.00"/>
+                      </label>
+                      <label class="col-form-label col-sm-4"> Filing Status :
+                        <select class="form-control"  [(ngModel)]="income.filingStatus" name="filingStatus-{{i}}" required>
+                          <option *ngFor="let key of filingStatusKeys" [value]="key" [label]="filingStatuses[key]"></option>
+                        </select>
+                      </label>
+                      <label class="col-form-label col-sm-4"> Exemptions:
+                        <input class="form-control" type="number" [(ngModel)]="income.exemptions" name="exemptions-{{i}}" required min="0"/>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <div *ngFor="let expense of income.preTaxExpenses; let j = index;">
+                        <div class="form-group row">
+                          <div class="col-sm-12">
+                            <h5> Expense {{j}} </h5>
+                            <div class="form-group row">
+                              <label class="col-form-label col-sm-3"> Name 
+                                <input class="form-control"  type="text" [(ngModel)]="expense.name" name="name-{{i}}{{j}}" required minlength="1"/> 
+                              </label>
+                              <label class="col-form-label col-sm-3"> Type 
+                                <select class="form-control" [(ngModel)]="expense.expensetype" name="preTaxExpenseType-{{i}}{{j}}" required>
+                                  <option *ngFor="let key of expenseKeys" [value]="key" [label]="expenseTypes[key]"></option>
+                                </select>
+                              </label>
+                              <label class="col-form-label col-sm-3"> Amount 
+                                <input class="form-control" type="number" [(ngModel)]="expense.amount" name="amount-{{i}}{{j}}" required min="0"/> 
+                              </label>  
+                              <button class="btn btn-danger col-sm-3" type="button" (click)="deletePreTaxExpense(income, expense)"> Delete </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn-secondary" type="button" (click)="addPreTaxExpense(income)"> Add Pre Tax Expense </button>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="income.incomeType==2">
+                  <h4>Hourly</h4>
+                  <div class="form-group">
+                    <div class="row">
+                      <label class="col-form-label col-sm-6"> Wage 
+                        <input class="form-control" type="number" [(ngModel)]="income.wage" name="wage-{{i}}" required min="0"/>
+                      </label>
+                      <label class="col-form-label col-sm-6"> Hours Worked 
+                        <input class="form-control" type="number" [(ngModel)]="income.hoursWorked" name="hoursWorked-{{i}}" required min="0"/>
+                      </label>
+                    </div>
+                    <div class="row">
+                      <label class="col-form-label col-sm-6"> Filing Status 
+                        <select class="form-control" [(ngModel)]="income.filingStatus" name="filingStatus-{{i}}" required>
+                          <option *ngFor="let key of filingStatusKeys" [value]="key" [label]="filingStatuses[key]"></option>
+                        </select>
+                      </label>
+                      <label class="col-form-label col-sm-6"> Exemptions
+                        <input class="form-control" type="number" [(ngModel)]="income.exemptions" name="exemptions-{{i}}" required min="0"/>
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <div *ngFor="let expense of income.preTaxExpenses; let j = index;">
+                        <div class="form-group row">
+                          <div class="col-sm-12">
+                            <h5> Expense {{j}} </h5>
+                            <div class="form-group row">
+                              <label class="col-form-label col-sm-3"> Name 
+                                <input class="form-control"  type="text" [(ngModel)]="expense.name" name="name-{{i}}{{j}}" required minlength="1"/> 
+                              </label>
+                              <label class="col-form-label col-sm-3"> Type 
+                                <select class="form-control" [(ngModel)]="expense.expensetype" name="preTaxExpenseType-{{i}}{{j}}" required>
+                                  <option *ngFor="let key of expenseKeys" [value]="key" [label]="expenseTypes[key]"></option>
+                                </select>
+                              </label>
+                              <label class="col-form-label col-sm-3"> Amount 
+                                <input class="form-control" type="number" [(ngModel)]="expense.amount" name="amount-{{i}}{{j}}" required min="0"/> 
+                              </label>  
+                              <button class="btn btn-danger col-sm-3" type="button" (click)="deletePreTaxExpense(income, expense)"> Delete </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn-secondary" type="button" (click)="addPreTaxExpense(income)"> Add Pre Tax Expense </button>
+                    </div>
+                  </div>
+                </div>
+                <button  class="btn btn-danger delete" type="button" (click)="deleteIncome(income)"> Delete </button>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" type="button" (click)="addIncome()"> Add Income </button>
+        </div>
+        <div class="b-expenses form-group">
+          <h4> Expenses: </h4>
+          <div class="no-list" *ngIf="budget.expenses.length < 1">
+            No Expenses
+          </div>
+          <div *ngFor="let expense of budget.expenses; let i = index">
+            <div class="form-group">
+              <label class="col-form-label col-sm-3"> Name 
+                <input class="form-control" type="text" [(ngModel)]="expense.name" name="name-{{i}}" required minlength="1"/>
+              </label>
+              <label class="col-form-label col-sm-3"> Type 
+                <select class="form-control" [(ngModel)]="expense.expenseType" name="expenseType-{{i}}" required>
+                  <option *ngFor="let key of expenseKeys" [value]="key" [label]="expenseTypes[key]"></option>
+                </select>
+              </label>
+              <label class="col-form-label col-sm-3"> Amount 
+                <input class="form-control" type="number" [(ngModel)]="expense.amount" name="amount-{{i}}" required min="0"/> 
+              </label>
+              <button class="btn btn-danger delete col-sm-3" type="button" (click)="deleteExpense(expense)"> Delete </button>
+            </div>
+          </div>
+          <button class="btn btn-secondary" type="button" (click)="addExpense()"> Add Expense </button>
+        </div>
+        <div class="row">
+          Balance: {{balance}}
+        </div>
+        <button class="btn btn-primary" type="submit" [disabled]="!budgetForm.valid"> Save </button>
+      </form>
+    </div>
+  </div> 
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" type="button" (click)="activeModal.dismiss()"> Cancel </button>
+</div>

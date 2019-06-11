@@ -63,7 +63,7 @@ export class BudgetsComponent implements OnInit {
     modalRef.componentInstance.budget = budget;
     modalRef.result.then((result) =>{
       this.getBudgets();
-      this.budgets.filter(b => b!== budget);
+      this.budgets = this.budgets.filter(b => b!== budget);
     });
   }
 

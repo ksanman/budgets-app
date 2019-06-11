@@ -1,4 +1,4 @@
 export enum IncomeType {
-    Salary = 1,
-    Hourly
+    'Salary' = 1,
+    'Hourly'
 }

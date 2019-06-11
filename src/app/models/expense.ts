@@ -5,5 +5,8 @@ export class Expense {
     public expenseType: ExpenseType;
     public amount: number;
 
-    constructor( ){}
+    constructor( ) {
+      this.expenseType = ExpenseType.Fixed;
+      this.amount = 0.00;
+    }
 }

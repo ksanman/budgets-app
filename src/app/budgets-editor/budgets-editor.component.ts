@@ -6,7 +6,7 @@ import { BudgetPeriod } from '../models/budget-period.enum';
 import { IncomeType } from '../models/income-type.enum';
 import { FilingStatus } from '../models/filing-status.enum';
 import { ExpenseType } from '../models/expense-type.enum';
-//import { Income } from '../models/income';
+// import { Income } from '../models/income';
 import { Expense } from '../models/expense';
 import { BudgetsService } from '../services/budgets.service';
 import { Income } from '../models/annual-income';
@@ -18,7 +18,7 @@ import { PayFrequency } from '../models/pay-frequency.enum';
   styleUrls: ['./budgets-editor.component.css']
 })
 export class BudgetsEditorComponent implements OnInit {
-  
+
   @Input() public budget: Budget;
 
   public budgetFrequencyKeys: any[];
@@ -48,42 +48,43 @@ export class BudgetsEditorComponent implements OnInit {
     this.budget = new Budget(this.budget.id, this.budget.name, this.budget.budgetPeriod, this.budget.incomes, this.budget.expenses);
   }
 
-  onSubmit(){
-    if(this.budget.id !== 0){
+  onSubmit() {
+    if (this.budget.id !== 0) {
       this.budgetService.updateBudget(this.budget).subscribe();
-    }
-    else{
-      this.budgetService.addBudget(this.budget).subscribe(b=> this.budget = new Budget(b.id, b.name, b.budgetPeriod, b.incomes, b.expenses));
+    } else {
+      this.budgetService.addBudget(this.budget)
+      .subscribe(b => this.budget = new Budget(b.id, b.name, b.budgetPeriod, b.incomes, b.expenses));
     }
 
     this.activeModal.close(this.budget);
   }
 
-  addIncome(){
+  addIncome() {
     this.budget.incomes.push(new Income());
   }
 
-  deleteIncome(income: Income){
+  deleteIncome(income: Income) {
     this.budget.incomes = this.budget.incomes.filter(i => i !== income);
   }
-      
-  addPreTaxExpense(income: Income){
+
+  addPreTaxExpense(income: Income) {
     this.budget.incomes.find(i => i === income).preTaxExpenses.push(new Expense());
   }
 
-  deletePreTaxExpense(income: Income, expense: Expense){
-    this.budget.incomes.find(i => i === income).preTaxExpenses = this.budget.incomes.find(i => i === income).preTaxExpenses.filter(e => e !== expense);
+  deletePreTaxExpense(income: Income, expense: Expense) {
+    this.budget.incomes.find(i => i === income).preTaxExpenses = this.budget.incomes.find(i => i === income).preTaxExpenses
+    .filter(e => e !== expense);
   }
 
-  addExpense(){
+  addExpense() {
     this.budget.expenses.push(new Expense());
   }
 
-  deleteExpense(expense: Expense){
+  deleteExpense(expense: Expense) {
     this.budget.expenses = this.budget.expenses.filter(e => e !== expense);
   }
 
-  get balance(): number{
-    return this.budget.calculateBalance();
+  get balance(): number {
+    return this.budget.balance;
   }
 }

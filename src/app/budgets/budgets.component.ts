@@ -5,7 +5,6 @@ import {FormGroup, FormControl, Validators} from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BudgetsEditorComponent } from '../budgets-editor/budgets-editor.component';
 import { BudgetPeriod } from '../models/budget-period.enum';
-//import { Income } from '../models/income';
 import { Income } from '../models/annual-income';
 import { IncomeType } from '../models/income-type.enum';
 import { Expense } from '../models/expense';
@@ -31,27 +30,29 @@ export class BudgetsComponent implements OnInit {
   getBudgets() {
       return this.budgetService.getBudgets()
       .subscribe(budgets => budgets.forEach(b => {
-        let incomes = this.getIncomes(b.incomes);
-        let expenses = this.getExpenses(b.expenses);
-        this.budgets.push(new Budget(b.id, b.name, b.budgetPeriod, incomes, expenses))}
-        ));
+        if (!this.budgets.find(existingBudget => existingBudget.id === b.id)) {
+          const incomes = this.getIncomes(b.incomes);
+          const expenses = this.getExpenses(b.expenses);
+          this.budgets.push(new Budget(b.id, b.name, b.budgetPeriod, incomes, expenses));
+        }
+      }));
   }
 
-  getIncomes(incomes: Income[]){
-    let newIncomes = [];
-    for(let income of incomes){
-      let newIncome = Object.assign(new Income(), income);
+  getIncomes(incomes: Income[]) {
+    const newIncomes = [];
+    for (const income of incomes) {
+      const newIncome = Object.assign(new Income(), income);
       newIncome.preTaxExpenses = this.getExpenses(newIncome.preTaxExpenses);
       newIncomes.push(newIncome);
     }
     return newIncomes;
   }
 
-  getExpenses(expenses: Expense[]){
-    let newExpenses = [];
+  getExpenses(expenses: Expense[]) {
+    const newExpenses = [];
 
-    for(let expense of expenses){
-      let newExpense = Object.assign(new Expense(), expense);
+    for (const expense of expenses) {
+      const newExpense = Object.assign(new Expense(), expense);
       newExpenses.push(newExpense);
     }
 
@@ -61,9 +62,9 @@ export class BudgetsComponent implements OnInit {
   update(budget: Budget) {
     const modalRef = this.modalService.open(BudgetsEditorComponent, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
     modalRef.componentInstance.budget = budget;
-    modalRef.result.then((result) =>{
+    modalRef.result.then((result) => {
       this.getBudgets();
-      this.budgets = this.budgets.filter(b => b!== budget);
+      this.budgets = this.budgets.filter(b => b !== budget);
     });
   }
 
@@ -72,17 +73,18 @@ export class BudgetsComponent implements OnInit {
     this.budgetService.deleteBudget(budget).subscribe();
   }
 
-  addBudget(){
-    let budget = new Budget(0, '', BudgetPeriod.Monthly, [], []);
+  addBudget() {
+    const budget = new Budget(null, '', BudgetPeriod.Monthly, [], []);
+    this.update(budget);
     // this.budgetService.addBudget(budget).subscribe(b => {
     //   this.budgets.push(new Budget(b.id, b.name, b.budgetPeriod, b.incomes, b.expenses));
     //   const modalRef = this.modalService.open(BudgetsEditorComponent, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
     //   modalRef.componentInstance.budget = b;
     // });
-    const modalRef = this.modalService.open(BudgetsEditorComponent, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
-    modalRef.componentInstance.budget = budget;
-    modalRef.result.then(result =>{
-      console.log(result);
-    });
+    // const modalRef = this.modalService.open(BudgetsEditorComponent, {ariaLabelledBy: 'modal-basic-title', size: 'lg'});
+    // modalRef.componentInstance.budget = budget;
+    // modalRef.result.then(result => {
+    //   console.log(result);
+    // });
   }
 }

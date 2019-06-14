@@ -37,11 +37,11 @@ export class BudgetsEditorComponent implements OnInit {
   public payFrequencies = PayFrequency;
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder, private budgetService: BudgetsService) {
-    this.budgetFrequencyKeys = Object.keys(this.budgetFrequencies).filter(f => !isNaN(Number(f))).map(k => parseInt(k));
-    this.incomeTypeKeys = Object.keys(this.incomeTypes).filter(f => !isNaN(Number(f))).map(k => parseInt(k));
-    this.filingStatusKeys = Object.keys(this.filingStatuses).filter(f => !isNaN(Number(f))).map(k => parseInt(k));
-    this.expenseKeys = Object.keys(this.expenseTypes).filter(f => !isNaN(Number(f))).map(k => parseInt(k));
-    this.payFrequencyKeys = Object.keys(this.payFrequencies).filter(f => !isNaN(Number(f))).map(k => parseInt(k));
+    this.budgetFrequencyKeys = Object.keys(this.budgetFrequencies).filter(f => !isNaN(Number(f))).map(k => parseInt(k, 10));
+    this.incomeTypeKeys = Object.keys(this.incomeTypes).filter(f => !isNaN(Number(f))).map(k => parseInt(k, 10));
+    this.filingStatusKeys = Object.keys(this.filingStatuses).filter(f => !isNaN(Number(f))).map(k => parseInt(k, 10));
+    this.expenseKeys = Object.keys(this.expenseTypes).filter(f => !isNaN(Number(f))).map(k => parseInt(k, 10));
+    this.payFrequencyKeys = Object.keys(this.payFrequencies).filter(f => !isNaN(Number(f))).map(k => parseInt(k, 10));
     }
 
   ngOnInit() {
@@ -49,14 +49,16 @@ export class BudgetsEditorComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.budget.id !== 0) {
-      this.budgetService.updateBudget(this.budget).subscribe();
+    if (this.budget.id) {
+      this.budgetService.updateBudget(this.budget).subscribe(b => this.activeModal.close(this.budget));
+
     } else {
       this.budgetService.addBudget(this.budget)
-      .subscribe(b => this.budget = new Budget(b.id, b.name, b.budgetPeriod, b.incomes, b.expenses));
+      .subscribe(b => {
+         this.budget = new Budget(b.id, b.name, b.budgetPeriod, b.incomes, b.expenses);
+         this.activeModal.close(this.budget);
+      });
     }
-
-    this.activeModal.close(this.budget);
   }
 
   addIncome() {
